@@ -6,10 +6,10 @@ Global Router
 / login -> Login
 / search -> Search
 
-/user/:id -> See User
-users/logout -> Log out
-/user/edit -> Edit my prorile
-/user/delete -> Delete my profile
+/users/:id -> See User
+/users/logout -> Log out
+/users/edit -> Edit my prorile
+/users/delete -> Delete my profile
 
 /videos/:id -> Watch Video
 /videos/:id/edit -> Edit Video
