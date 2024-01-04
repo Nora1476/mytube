@@ -8,8 +8,10 @@ const PORT = 4000;
 
 const app = express();
 const logger = morgan("dev");
-app.use(logger);
 
+app.set("view engine", "pug"); //뷰엔진 선업
+app.set("views", process.cwd() + "/src/views"); //뷰 기본 루트폴더 변경
+app.use(logger);
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
