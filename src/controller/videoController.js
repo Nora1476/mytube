@@ -16,17 +16,32 @@ export const home = async (req, res) => {
 export const watch = async (req, res) => {
   const { id } = req.params; //params = url로 넘어오는 변수를 가져오는 함수
   const video = await Video.findById(id);
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
   return res.render("watch", { pageTitle: video.title, video });
 };
 
-export const getEdit = (req, res) => {
+export const getEdit = async (req, res) => {
   const { id } = req.params;
-  return res.render("edit", { pageTitle: `Editing` });
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
+  return res.render("edit", { pageTitle: `Editing ${video.title}`, video });
 };
 
-export const postEdit = (req, res) => {
+export const postEdit = async (req, res) => {
   const { id } = req.params; //router에서 url주소로 보낸 id값을 가져옴
-  const { title } = req.body; //req.body : form에 있는 자바스크립트의 현재 값!
+  const { title, description, hashtags } = req.params;
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
+  video.title = title;
+  video.description = description;
+  await video.save();
+
   return res.redirect(`/videos/${id}`);
 };
 

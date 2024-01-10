@@ -6,8 +6,8 @@ const vedioSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now, required: true },
   hashtags: [{ type: String, trim: true }],
   meta: {
-    views: { type: Number, defualt: 0, required: true },
-    rating: { type: Number, defualt: 0, required: true },
+    views: { type: Number, default: 0, required: true },
+    rating: { type: Number, default: 0, required: true },
   },
 });
 
