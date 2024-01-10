@@ -5,7 +5,7 @@ block content
     span=errorMessage 
 
   form(method="POST")
-    input(placeholder="Title", name="title", type="text", required)
-    input(placeholder="Description", name="description", type="text", required)
+    input(placeholder="Title", name="title", type="text", required minlength=10 maxlength=80)
+    input(placeholder="Description", name="description", type="text", required minlength=20)
     input(placeholder="Hashtags, separated by comma", name="hashtags", type="text", required)
     input(type="submit", value="Upload Video")
