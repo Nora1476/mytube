@@ -4,7 +4,7 @@ import Video from "../models/Video";
 //res.render(view, 넘겨줄 데이터) : view엔진으로 server.js에 등록된 view파일을 바로 렌더링 해줌
 //res.send() : html 형태로 바로 응답을 보냄
 export const home = async (req, res) => {
-  const videos = await Video.find({})
+  const videos = await Video.find({}) //mongoose와 연결된 모델파일 안에 Video를 통해 모든 비디오 데이터를 배열형태로 가져옴
     .then((videos) => {
       res.render("home", { pageTitle: "Home", videos });
     })
@@ -13,9 +13,10 @@ export const home = async (req, res) => {
     });
 };
 
-export const watch = (req, res) => {
+export const watch = async (req, res) => {
   const { id } = req.params; //params = url로 넘어오는 변수를 가져오는 함수
-  return res.render("watch", { pageTitle: `Watching` });
+  const video = await Video.findById(id);
+  return res.render("watch", { pageTitle: video.title, video });
 };
 
 export const getEdit = (req, res) => {

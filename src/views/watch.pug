@@ -1,8 +1,9 @@
 extends base
 
-block content   
-  h3 #{video.views} #{video.views === 1? "view" :"views"}
-  
+block content
+  div   
+    p=video.description
+    small=video.createdAt 
   //- 제일앞에 /가있으면 절대경로임 경로 지정시 주의
   //- a(href="/video/edit")--->localhost:4000/video/edit
   //- a(href="video/edit")--->localhost:4000/videos/video/edit
