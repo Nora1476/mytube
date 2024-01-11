@@ -6,13 +6,15 @@ html(lang="ko")
       
   body  
     header 
+      h1=pageTitle
       nav 
         ul 
           li 
             a(href="/") Home
           li 
             a(href="/videos/upload") Upload
-      h1=pageTitle
+          li 
+            a(href="/search") Search
 
     main 
       block content 

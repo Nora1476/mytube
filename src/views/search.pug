@@ -1,0 +1,13 @@
+extends base
+include mixins/video
+
+
+block content
+  form(mothod="GET")
+    input(placeholder="Serch by title", type="text" name="keyword")
+    input(type="submit" value="Search Now")
+
+    //- mixin 파일에 있는 video.pug를 비동기로 가져오는 형태
+    each video in videos 
+      +video(video)
+  
