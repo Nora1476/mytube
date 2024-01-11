@@ -7,6 +7,8 @@ import userRouter from "./routers/userRouter";
 const app = express();
 const logger = morgan("dev");
 
+app.use(express.static("public"));
+
 app.set("view engine", "pug"); //뷰엔진 선언
 app.set("views", process.cwd() + "/src/views"); //뷰 기본 루트폴더 변경
 app.use(logger);

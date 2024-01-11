@@ -32,15 +32,21 @@ export const getEdit = async (req, res) => {
 };
 
 export const postEdit = async (req, res) => {
-  const { id } = req.params; //router에서 url주소로 보낸 id값을 가져옴
-  const { title, description, hashtags } = req.params;
-  const video = await Video.findById(id);
+  const { id } = req.params;
+  const { title, description, hashtags } = req.body;
+
+  //findbyId() 함수를 쓰면 object전체를 가지고 오지만
+  //exists() 함수를 쓰면 필터링을 통해 존재여부 확인후 ture,false형태의 불린값 출력
+  const video = await Video.exists({ _id: id });
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
   }
-  video.title = title;
-  video.description = description;
-  await video.save();
+  //mongoose 함수 사용하여 update
+  await Video.findByIdAndUpdate(id, {
+    title,
+    description,
+    hashtags: Video.formatHashtags(hashtags),
+  });
 
   return res.redirect(`/videos/${id}`);
 };
@@ -57,7 +63,7 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title: title,
       description: description,
-      hashtags: hashtags.split(",").map((word) => `#${word}`),
+      hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/");
   } catch (error) {
