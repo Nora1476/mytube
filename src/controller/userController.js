@@ -6,7 +6,7 @@ export const postJoin = async (req, res) => {
 
   //유효성검사
   if (password !== password2) {
-    return res.status(400).render("join", { pageTitle, errorMessage: "Password confirmation does not match." });
+    return res.status(400).render("join", { pageTitle, errorMessage: "Password confirmation does not match!" });
   }
   const pageTitle = "Join";
   const exists = await User.exists({ $or: [{ username: username }, { email: email }] });
