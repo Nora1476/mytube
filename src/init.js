@@ -1,4 +1,5 @@
 import "./db"; //몽고와 연결
+import "./models/User";
 import "./models/Video";
 import app from "./server";
 
