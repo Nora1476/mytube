@@ -1,11 +1,10 @@
 import express from "express";
-import { edit, remove, logout, login, see } from "../controller/userController";
+import { edit, remove, logout, see } from "../controller/userController";
 
 const userRouter = express.Router();
 
 //get( "경로", 함수가 와야함 )
 //정규표현식 : (\\d+) 숫자만 올 수 있음
-userRouter.get("/login", login);
 userRouter.get("/logout", logout);
 userRouter.get("/edit", edit);
 userRouter.get("/remove", remove);
