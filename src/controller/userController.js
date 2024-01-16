@@ -63,6 +63,10 @@ export const postLogin = async (req, res) => {
       errorMessage: "Wrong Passoword.",
     });
   }
+
+  //세션 저장 : session은 object형태로 되어있는데 loggedIn, user항목 추가
+  req.session.loggedIn = true;
+  req.session.user = user;
   return res.redirect("/");
 };
 
