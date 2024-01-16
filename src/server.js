@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import session from "express-session";
 import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
@@ -14,6 +15,30 @@ app.set("views", process.cwd() + "/src/views"); //뷰 기본 루트폴더 변경
 app.use(logger);
 
 app.use(express.urlencoded({ extended: true })); //express가 form으로 넘어오는 값을 이해할 수 있도록 설정
+
+//라우터 실행전에 세션 실행
+//세션미들웨어가 사이트로 들어오는 모두를 기악하게함
+app.use(
+  session({
+    secret: "Hello!",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+app.use((req, res, next) => {
+  console.log(req.headers);
+  next();
+});
+app.use((req, res, next) => {
+  req.sessionStore.all((error, sessions) => console.log(sessions));
+  next();
+});
+
+app.get("/add_one", (req, res, next) => {
+  req.session.potato += 1;
+  return res.send(`${req.session.id}\n${req.session.potato}`);
+});
+
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
