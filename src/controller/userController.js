@@ -64,9 +64,10 @@ export const postLogin = async (req, res) => {
     });
   }
 
-  //세션 저장 : session은 object형태로 되어있는데 loggedIn, user항목 추가
+  //세션 저장 : session은 object형태로 되어있는데 로그인하는 유저에게 부여된 session에 loggedIn, user항목 추가
   req.session.loggedIn = true;
   req.session.user = user;
+
   return res.redirect("/");
 };
 

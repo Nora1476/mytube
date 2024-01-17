@@ -12,6 +12,7 @@ export const home = async (req, res) => {
     .catch((error) => {
       console.log("error : ", error);
     });
+  // console.log(req.session);
 };
 
 export const watch = async (req, res) => {
