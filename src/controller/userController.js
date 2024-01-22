@@ -103,7 +103,7 @@ export const finishGithubLogin = async (req, res) => {
         Accept: "application/json",
       },
     })
-  ).json();
+  ).json(); //github ait와 소통할 수 있는 access토큰을 fetch함수를 통해 json형태로 받아옴
   // res.send(JSON.stringify(tokenRequest)); //tokenRequest 데이터 확인
 
   if ("access_token" in tokenRequest) {
@@ -111,7 +111,7 @@ export const finishGithubLogin = async (req, res) => {
     const { access_token } = tokenRequest;
     const apiUrl = "https://api.github.com";
 
-    //4. user 정보를 받아옴(email은 null인 상태)
+    //4. user 정보를 받아옴(email은 null인 상태 = github에 verified된 email이 없는 상태)
     const userData = await (
       await fetch(`${apiUrl}/user`, {
         headers: {
