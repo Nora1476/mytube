@@ -47,7 +47,7 @@ export const postLogin = async (req, res) => {
   //유저가 입력한 값 받아오기
   const { username, password } = req.body;
   //유저가 존재하는지 체크
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username, socialOnly: false });
   if (!user) {
     return res.status(400).render("login", {
       pageTitle,
@@ -73,27 +73,28 @@ export const postLogin = async (req, res) => {
 
 export const startGithubLogin = (req, res) => {
   const baseUrl = "https://github.com/login/oauth/authorize";
-
   const config = {
     client_id: process.env.GH_CLIENT,
     allow_signup: false,
-    scope: "read:user user:email",
+    scope: "read:user user:email", //user에대해 요청할 정보를 scope에 띄어쓰기로 구분하여 입력
   };
   const params = new URLSearchParams(config).toString();
   const finalUrl = `${baseUrl}?${params}`;
-  return res.redirect(finalUrl);
+
+  return res.redirect(finalUrl); //1. 로그인을 위래 user를 깃허브로 넘김
 };
 
+//2. 사용자가 깃허브로그인요청 승인시 post로 동작하는 코드(github OAhuth설청시 입력해둔 페이지로 이동)
 export const finishGithubLogin = async (req, res) => {
   const baseUrl = "https://github.com/login/oauth/access_token";
   const config = {
     client_id: process.env.GH_CLIENT,
     client_secret: process.env.GH_SECRET,
-    code: req.query.code, //깃허브에서 url로 넘겨주는 코드
+    code: req.query.code, //깃허브로부터 url로 넘겨받는 코드
   };
 
-  //url로 필요한 user정보 요청
-  const params = new URLSearchParams(config).toString();
+  //3. user정보 요청
+  const params = new URLSearchParams(config).toString(); //url 넘겨받은 code를 받아옴
   const finalUrl = `${baseUrl}?${params}`;
   const tokenRequest = await (
     await fetch(finalUrl, {
@@ -103,19 +104,55 @@ export const finishGithubLogin = async (req, res) => {
       },
     })
   ).json();
+  // res.send(JSON.stringify(tokenRequest)); //tokenRequest 데이터 확인
 
-  // res.send(JSON.stringify(tokenRequest));
   if ("access_token" in tokenRequest) {
     //access api
     const { access_token } = tokenRequest;
-    const userRequest = await (
-      await fetch("https://api.github.com/user", {
+    const apiUrl = "https://api.github.com";
+
+    //4. user 정보를 받아옴(email은 null인 상태)
+    const userData = await (
+      await fetch(`${apiUrl}/user`, {
         headers: {
           Authorization: `token ${access_token}`,
         },
       })
     ).json();
-    console.log(userRequest);
+    // console.log(userData);
+
+    //5. email정보 요청으로 email 데이터를 arr로 받아옴
+    const emailData = await (
+      await fetch(`${apiUrl}/user/emails`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+
+    //6. user 이메일정보 최종으로 받아옴(객체형테) primary, verfied가 true인 값
+    const emailObj = emailData.find((email) => email.primary === true && email.verified === true);
+    if (!emailObj) {
+      return res.redirect("/login");
+    }
+
+    let user = await User.findOne({ email: emailObj.email });
+    if (!user) {
+      //깃허브 로그인가입은 되어있는데 일반 가입은 되어있지 않을때 (password, socialOnly 항목 설정)
+      const user = await User.create({
+        name: userData.name ? userData.name : "Unknown",
+        username: userData.login,
+        email: emailObj.email,
+        password: "",
+        socialOnly: true,
+        location: userData.location,
+      });
+    }
+    //세션 저장
+    //동일한 이메일로 기존가입 및 깃허브 로그인이 둘 다 설정되어있을 때
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
   } else {
     return res.redirect("/login");
   }
