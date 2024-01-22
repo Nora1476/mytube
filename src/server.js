@@ -27,7 +27,7 @@ app.use(
     resave: false, // request마다 세션의 변경사항이 있든 없든 세션을 다시 저장
     saveUninitialized: false, //request 때 생성된 이후로 아무런 작업이 가해지지않는 초기상태의 세션
     cookie: {
-      maxAge: 5000,
+      // maxAge: 5000,  //세션유지 기간설정 밀리세컨단위
     },
     //서버에 내 세션이 저장될 수있도록 설정
     store: MongoStore.create({ mongoUrl: process.env.DB_URL }),

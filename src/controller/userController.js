@@ -119,7 +119,7 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
-    // console.log(userData);
+    console.log(userData);
 
     //5. email정보 요청으로 email 데이터를 arr로 받아옴
     const emailData = await (
@@ -141,6 +141,7 @@ export const finishGithubLogin = async (req, res) => {
       //깃허브 로그인가입은 되어있는데 일반 가입은 되어있지 않을때 (password, socialOnly 항목 설정)
       const user = await User.create({
         name: userData.name ? userData.name : "Unknown",
+        avatarUrl: userData.avatar_url,
         username: userData.login,
         email: emailObj.email,
         password: "",
@@ -158,7 +159,9 @@ export const finishGithubLogin = async (req, res) => {
   }
 };
 
+export const logout = (req, res) => {
+  req.session.destroy();
+  return res.redirect("/");
+};
 export const edit = (req, res) => res.send("Edit User");
-export const remove = (req, res) => res.send("Delete User");
-export const logout = (req, res) => res.send("Log out");
 export const see = (req, res) => res.send("See Users");

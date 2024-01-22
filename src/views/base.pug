@@ -19,7 +19,7 @@ html(lang="ko")
           //- 로그인했을때 nav bar 다르게 설정
           if loggedIn
             li 
-              a(href="/logout") Log out  
+              a(href="/users/logout") Log out  
             li
               a(href="/my_profile") #{loggedInUser.name}의 Profile
           else
