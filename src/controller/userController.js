@@ -78,13 +78,15 @@ export const startGithubLogin = (req, res) => {
     allow_signup: false,
     scope: "read:user user:email", //user에대해 요청할 정보를 scope에 띄어쓰기로 구분하여 입력
   };
+  //URLSearchParams() 매개변수로 받은  인자를 url상에서도 동작할수 있게끔 인코딩
   const params = new URLSearchParams(config).toString();
   const finalUrl = `${baseUrl}?${params}`;
 
-  return res.redirect(finalUrl); //1. 로그인을 위래 user를 깃허브로 넘김
+  return res.redirect(finalUrl); //1. 로그인을 위해 user를 깃허브로 넘김
 };
 
-//2. 사용자가 깃허브로그인요청 승인시 post로 동작하는 코드(github OAhuth설청시 입력해둔 페이지로 이동)
+//2. 사용자가 깃허브로그인요청 승인시 url로 code를 넘겨받음  async, await사용
+//(github OAhuth설청시 입력해둔 페이지로 이동)
 export const finishGithubLogin = async (req, res) => {
   const baseUrl = "https://github.com/login/oauth/access_token";
   const config = {
@@ -93,8 +95,8 @@ export const finishGithubLogin = async (req, res) => {
     code: req.query.code, //깃허브로부터 url로 넘겨받는 코드
   };
 
-  //3. user정보 요청
-  const params = new URLSearchParams(config).toString(); //url 넘겨받은 code를 받아옴
+  //3. 념겨받은 code를 post로 보내서 access토큰으로 교환 (fatch 함수 사용)
+  const params = new URLSearchParams(config).toString();
   const finalUrl = `${baseUrl}?${params}`;
   const tokenRequest = await (
     await fetch(finalUrl, {
@@ -103,15 +105,15 @@ export const finishGithubLogin = async (req, res) => {
         Accept: "application/json",
       },
     })
-  ).json(); //github ait와 소통할 수 있는 access토큰을 fetch함수를 통해 json형태로 받아옴
+  ).json(); //github와 소통할 수 있는 access토큰을 fetch함수를 통해 json형태로 받아옴
   // res.send(JSON.stringify(tokenRequest)); //tokenRequest 데이터 확인
 
+  //4. access_token을 이용해 github API로 가서
+  //user 정보를 받아옴(email은 null인 상태 = github에 verified된 email이 없는 상태)
   if ("access_token" in tokenRequest) {
     //access api
     const { access_token } = tokenRequest;
     const apiUrl = "https://api.github.com";
-
-    //4. user 정보를 받아옴(email은 null인 상태 = github에 verified된 email이 없는 상태)
     const userData = await (
       await fetch(`${apiUrl}/user`, {
         headers: {
@@ -133,6 +135,7 @@ export const finishGithubLogin = async (req, res) => {
     //6. user 이메일정보 최종으로 받아옴(객체형테) primary, verfied가 true인 값
     const emailObj = emailData.find((email) => email.primary === true && email.verified === true);
     if (!emailObj) {
+      //이메일 데이터가 없으면
       return res.redirect("/login");
     }
 
@@ -147,6 +150,84 @@ export const finishGithubLogin = async (req, res) => {
         password: "",
         socialOnly: true,
         location: userData.location,
+      });
+    }
+    //세션 저장
+    //동일한 이메일로 기존가입 및 깃허브 로그인이 둘 다 설정되어있을 때
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
+  } else {
+    return res.redirect("/login");
+  }
+};
+
+export const startKakaoLogin = (req, res) => {
+  const baseUrl = "https://kauth.kakao.com/oauth/authorize";
+
+  const config = {
+    client_id: process.env.KAKAO_CLIENT,
+    redirect_uri: "http://localhost:4000/users/kakao/finish",
+    response_type: "code",
+  };
+  //URLSearchParams() 매개변수로 받은  인자를 url상에서도 동작할수 있게끔 인코딩
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+
+  return res.redirect(finalUrl);
+};
+
+export const finishKakaoLogin = async (req, res) => {
+  const baseUrl = "	https://kauth.kakao.com/oauth/token";
+  const config = {
+    grant_type: "authorization_code",
+    client_id: process.env.KAKAO_CLIENT,
+    redirect_uri: "http://localhost:4000/users/kakao/finish",
+    code: req.query.code,
+    client_secret: process.env.KAKAO_SECRET,
+  };
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+  const tokenRequest = await (
+    await fetch(finalUrl, {
+      method: "POST",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded;charset=utf-8",
+      },
+    })
+  ).json();
+  // res.send(JSON.stringify(tokenRequest)); //tokenRequest 데이터 확인
+
+  if ("access_token" in tokenRequest) {
+    //access api
+    const { access_token } = tokenRequest;
+    const apiUrl = "https://kapi.kakao.com/v2/user/me";
+    const userData = await (
+      await fetch(`${apiUrl}`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+        },
+      })
+    ).json();
+    console.log("data", userData);
+
+    const emailData = userData.kakao_account.email;
+    if (!emailData) {
+      // 이메일 데이터가 없으면
+      return res.redirect("/login");
+    }
+    let user = await User.findOne({ email: emailData });
+    if (!user) {
+      //깃허브 로그인가입은 되어있는데 일반 가입은 되어있지 않을때 (password, socialOnly 항목 설정)
+      const user = await User.create({
+        name: userData.kakao_account.profile.nickname,
+        avatarUrl: userData.kakao_account.profile.thumbnail_image_url,
+        username: userData.kakao_account.profile.nickname,
+        email: userData.kakao_account.email,
+        password: "",
+        socialOnly: true,
+        location: userData.connected_at,
       });
     }
     //세션 저장
