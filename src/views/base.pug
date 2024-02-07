@@ -11,13 +11,16 @@ html(lang="ko")
         ul 
           li   
             a(href="/") Home
-          li 
-            a(href="/videos/upload") Upload 
+
           li 
             a(href="/search") Search
           
           //- 로그인했을때 nav bar 다르게 설정
           if loggedIn
+            li 
+              a(href="/videos/upload") Upload 
+            li 
+              a(href="/users/edit") Edit Profile 
             li 
               a(href="/users/logout") Log out  
             li

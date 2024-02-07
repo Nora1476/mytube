@@ -121,7 +121,7 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
-    console.log(userData);
+    // console.log(userData);
 
     //5. email정보 요청으로 email 데이터를 arr로 받아옴
     const emailData = await (
@@ -156,6 +156,7 @@ export const finishGithubLogin = async (req, res) => {
     //동일한 이메일로 기존가입 및 깃허브 로그인이 둘 다 설정되어있을 때
     req.session.loggedIn = true;
     req.session.user = user;
+
     return res.redirect("/");
   } else {
     return res.redirect("/login");
@@ -210,7 +211,7 @@ export const finishKakaoLogin = async (req, res) => {
         },
       })
     ).json();
-    console.log("data", userData);
+    // console.log("data", userData);
 
     const emailData = userData.kakao_account.email;
     if (!emailData) {
@@ -234,6 +235,7 @@ export const finishKakaoLogin = async (req, res) => {
     //동일한 이메일로 기존가입 및 깃허브 로그인이 둘 다 설정되어있을 때
     req.session.loggedIn = true;
     req.session.user = user;
+
     return res.redirect("/");
   } else {
     return res.redirect("/login");
@@ -244,5 +246,108 @@ export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
 };
-export const edit = (req, res) => res.send("Edit User");
+
+export const getEdit = (req, res) => {
+  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+};
+export const postEdit = async (req, res) => {
+  // const id = req.session.user.id;
+  // const { name, email, username, location } = req.body;
+  const {
+    //위 두줄의 변수를 하나의 변수로 생성 (ES6문법)
+    session: {
+      user: { _id, email: sessionEmail, username: sessionUsername },
+    },
+    body: { name, email, username, location }, //edit-profile.pug 내 form에서 받아온 name값
+  } = req;
+
+  // email, username 중복 유효성검사 방법1
+  // const findUsername = await User.findOne({ username });
+  // const findEmail = await User.findOne({ email });
+  // if ((findUsername != null && findUsername._id != _id) || (findEmail != null && findEmail._id != _id)) {
+  //   return res.render("edit-profile", {
+  //     pageTitle: "Edit  Profile",
+  //     errorMessage: "User is exist",
+  //   });
+  // }
+
+  //방법2
+  //usernameExists = 사용자가 입력한 username과 sessionusername일치 하지 않으면 false 값을/ 아니면 undefined
+  const usernameExists = username != sessionUsername ? await User.exists({ username }) : undefined;
+  const emailExists = email != sessionEmail ? await User.exists({ email }) : undefined;
+  if (usernameExists || emailExists) {
+    return res.render("edit-profile", {
+      pageTitle: "Edit Profile",
+      usernameErrorMessage: usernameExists ? "This username is already taken" : "",
+      emailErrorMessage: emailExists ? "This email is already taken" : "",
+    });
+  }
+
+  //db에 있는 user를 id값으로 찾아 내용 업데이트
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      name: name,
+      email: email,
+      username: username,
+      location: location,
+    },
+    //아래 세션반영 update 방식과 같은 mongoose 함수 사용
+    { new: true }
+  );
+  req.session.user = updatedUser;
+
+  //변경된 내용을 세션에도 반영
+  // req.session.user = {
+  //   ...req.session.user,
+  //   name,
+  //   email,
+  //   username,
+  //   location,
+  // };
+
+  return res.redirect("/users/edit");
+};
+
+export const getChangeePassword = (req, res) => {
+  //소셜로그인 사용자일 경우 홈으로 이동
+  if (req.session.user.socialOnly === true) {
+    return res.redirect("/");
+  }
+
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+export const postChangeePassword = async (req, res) => {
+  const {
+    //위 두줄의 변수를 하나의 변수로 생성 (ES6문법)
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConformation }, //edit-profile.pug 내 form에서 받아온 name값
+  } = req;
+
+  const user = await User.findById(_id);
+  //사용자가 입력한 기존비번번호와 db에 저장된 가장 최근 비밀번호 비교
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect.",
+    });
+  }
+  if (newPassword !== newPasswordConformation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The password does not match the confirmation.",
+    });
+  }
+
+  //user의 비번 대체 후
+  user.password = newPassword;
+  await user.save(); //새로운 암호를 models파일 내 User.js에서 해쉬 함수화
+
+  // send norification
+  return res.redirect("/users/logout");
+};
+
 export const see = (req, res) => res.send("See Users");
