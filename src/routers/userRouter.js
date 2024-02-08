@@ -12,14 +12,14 @@ import {
   getChangeePassword,
   postChangeePassword,
 } from "../controller/userController";
-import { piblicOnlyMiddleware, protectorMiddleware } from "../middlewares";
+import { piblicOnlyMiddleware, protectorMiddleware, uploadFiles } from "../middlewares";
 
 const userRouter = express.Router();
 
 //get( "경로", 함수가 와야함 )
 //정규표현식 : (\\d+) 숫자만 올 수 있음
 userRouter.get("/logout", protectorMiddleware, logout);
-userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(postEdit);
+userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(uploadFiles.single("avatar"), postEdit);
 userRouter.route("/change-password").all(protectorMiddleware).get(getChangeePassword).post(postChangeePassword);
 userRouter.get("/github/start", piblicOnlyMiddleware, startGithubLogin);
 userRouter.get("/github/finish", piblicOnlyMiddleware, finishGithubLogin);

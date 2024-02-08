@@ -5,13 +5,25 @@ block content
     span=emailErrorMessage
     span=usernameErrorMessage
 
-  form(method="post") 
-    //- value는 로그인시 middleware를 통해 local로 담아둔 정보로 pug가 바로 접근가능
-    input(placeholder="Name" name="name", type="text" required value=loggedInUser.name) 
-    input(placeholder="Email" name="email", type="email" required value=loggedInUser.email)
-    input(placeholder="Username" name="username", type="text" required value=loggedInUser.username) 
-    input(placeholder="Location" name="location", type="text" required value=loggedInUser.location)
-    input(type="submit", value="Update Profile")
+  form(method="post" enctype="multipart/form-data") 
+    //- value값은 로그인시 middleware를 통해 local로 담아둔 정보로 pug가 바로 접근가능
+    label(for="avatar") Avatar
+    input(type="file" id="avatar" name="avatar"  accept=".png, .jpg, .jepg")
+
+    label(for="name") Name
+    input(placeholder="Name"  id="name" name="name" type="text" required value=loggedInUser.name) 
+
+    label(for="email") Email
+    input(placeholder="Email" id="email" name="email" type="email" required value=loggedInUser.email)
+
+    label(for="username") Username
+    input(placeholder="Username" id="username" name="username" type="text" required value=loggedInUser.username) 
+
+    label(for="location") Location
+    input(placeholder="Location" id="location" name="location" type="text" required value=loggedInUser.location)
+
+    input(type="submit" value="Update Profile")
+
 
 
     //- 소셜로그인으로 가입한경우 비밀번호 변경한 노출되지 않음

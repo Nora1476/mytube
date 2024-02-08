@@ -1,3 +1,5 @@
+import multer from "multer";
+
 //pug 페이지에서 res.locals 오브젝트로 바로 접근가능
 export const localsMiddleware = (req, res, next) => {
   res.locals.loggedIn = Boolean(req.session.loggedIn);
@@ -26,3 +28,8 @@ export const piblicOnlyMiddleware = (req, res, next) => {
     return res.redirect("/");
   }
 };
+
+//multer : 사용자가 보내 멀티파일은 dest저장하도록 설정
+export const uploadFiles = multer({
+  dest: "uploads/",
+});
