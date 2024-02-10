@@ -256,7 +256,7 @@ export const postEdit = async (req, res) => {
   const {
     //위 두줄의 변수를 하나의 변수로 생성 (ES6문법)
     session: {
-      user: { _id, email: sessionEmail, username: sessionUsername },
+      user: { _id, email: sessionEmail, username: sessionUsername, avatarUrl },
     },
     file,
     body: { name, email, username, location }, //edit-profile.pug 내 form에서 받아온 name값
@@ -264,7 +264,8 @@ export const postEdit = async (req, res) => {
 
   console.log(file);
 
-  // email, username 중복 유효성검사 방법1
+  // email, username 중복 유효성검사
+  //방법1
   // const findUsername = await User.findOne({ username });
   // const findEmail = await User.findOne({ email });
   // if ((findUsername != null && findUsername._id != _id) || (findEmail != null && findEmail._id != _id)) {
@@ -290,6 +291,8 @@ export const postEdit = async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
+      //사용자가 파일변경을 하지 않을경우를 대비
+      avatarUrl: file ? `/${file.path}` : avatarUrl,
       name: name,
       email: email,
       username: username,
