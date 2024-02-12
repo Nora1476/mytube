@@ -1,3 +1,4 @@
+import User from "../models/User";
 import Video from "../models/Video";
 
 //controller파일 : 라우터에서 적용된 함수 따로 모아둔 파일
@@ -17,7 +18,8 @@ export const home = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params; //params = url로 넘어오는 변수를 가져오는 함수
-  const video = await Video.findById(id);
+  const video = await Video.findById(id).populate("owner"); //populate 함수를 통해 mongoose에게 User의 owner값을 가지고 오게 함
+
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
@@ -58,13 +60,19 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session;
+  const { path: fileUrl } = req.file;
   //post 형태로 전송된 name데이터를 받아옴
   const { title, description, hashtags } = req.body;
   //틀이 갖춰진 Video 데이터에 post로 받아온 내용스키마형태에 맞는 데이터를 자동으로 디비에 저장
   try {
     await Video.create({
-      title: title,
-      description: description,
+      title,
+      description,
+      fileUrl,
+      owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/");

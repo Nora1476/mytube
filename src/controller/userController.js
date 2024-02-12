@@ -1,5 +1,6 @@
 import User from "../models/User";
 import bcrypt from "bcrypt";
+import Video from "../models/Video";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -356,4 +357,16 @@ export const postChangeePassword = async (req, res) => {
   return res.redirect("/users/logout");
 };
 
-export const see = (req, res) => res.send("See Users");
+export const see = async (req, res) => {
+  //누구나 볼 수 있는 public페이지로 세션을 통해서 id를 가져오지 않음
+  //url을 통해 가져옴
+  const { id } = req.params;
+  const user = await User.findById(id);
+  if (!user) {
+    return req.status(404).render("404", { pageTitle: "User not found." });
+  }
+
+  const videos = await Video.find({ owner: user._id });
+  console.log(videos);
+  return res.render("users/profile", { pageTitle: `${user.name} Profile`, user, videos });
+};

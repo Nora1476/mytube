@@ -4,8 +4,13 @@ block content
   if errorMessage
     span=errorMessage 
 
-  form(method="POST")
-    input(placeholder="Title", name="title", type="text", required minlength=10 maxlength=80)
-    input(placeholder="Description", name="description", type="text", required minlength=20)
-    input(placeholder="Hashtags, separated by comma", name="hashtags", type="text", required)
-    input(type="submit", value="Upload Video")
+  form(method="POST" enctype="multipart/form-data")
+    label(for="video") Video File
+    input(type="file" accept="video/*" id="video", name="video", required)
+    label(for="title") Title
+    input(placeholder="Title", id="video", name="title", type="text", required minlength=5 maxlength=80)
+    label(for="description") Description
+    input(placeholder="Description", id="description", name="description", type="text", required minlength=10)
+    label(for="hashtags") Hashtags
+    input(placeholder="Hashtags, separated by comma", id="hashtags", name="hashtags", type="text", required)
+    input(type="submit", id="video", value="Upload Video")

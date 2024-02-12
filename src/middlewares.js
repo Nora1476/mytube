@@ -30,6 +30,15 @@ export const piblicOnlyMiddleware = (req, res, next) => {
 };
 
 //multer : 사용자가 보내 멀티파일은 dest저장하도록 설정
-export const uploadFiles = multer({
-  dest: "uploads/",
+export const avatarUpload = multer({
+  dest: "uploads/avatars/",
+  limits: {
+    fileSize: 3000000, //바이트
+  },
+});
+export const videoUpload = multer({
+  dest: "uploads/videos/",
+  limits: {
+    fileSize: 30000000, //바이트
+  },
 });

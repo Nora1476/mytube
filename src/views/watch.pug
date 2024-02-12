@@ -2,13 +2,22 @@ extends base
 
 
 block content
+  video(src="/"+video.fileUrl, controls,  width="500" height="300")
   div   
     p=video.description
     small=video.createdAt 
-  //- 제일앞에 /가있으면 절대경로임 경로 지정시 주의
-  //- a(href="/video/edit")--->localhost:4000/video/edit
-  //- a(href="video/edit")--->localhost:4000/videos/video/edit
-  a(href=`${video.id}/edit`) Edit Video &rarr;
+
+  div  
+    small Uploaded by 
+      a(href=`/users/${video.owner._id}`)=video.owner.name
+  
   <br>
-  a(href=`${video.id}/delete`) Delete Video &rarr;
+    
+    if String(video.owner._id) === String(loggedInUser._id)
+      //- 제일앞에 /가있으면 절대경로임 경로 지정시 주의
+      //- a(href="/video/edit")--->localhost:4000/video/edit
+      //- a(href="video/edit")--->localhost:4000/videos/video/edit
+      a(href=`${video.id}/edit`) Edit Video &rarr;
+      <br>
+      a(href=`${video.id}/delete`) Delete Video &rarr;
 
