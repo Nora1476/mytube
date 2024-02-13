@@ -17,9 +17,9 @@ export const home = async (req, res) => {
 };
 
 export const watch = async (req, res) => {
-  const { id } = req.params; //params = url로 넘어오는 변수를 가져오는 함수
+  const { id } = req.params; //params = url로 넘어오는 변수를 가져오는 함수  비디오
   const video = await Video.findById(id).populate("owner"); //populate 함수를 통해 mongoose에게 User의 owner값을 가지고 오게 함
-
+  console.log(video);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
@@ -28,15 +28,25 @@ export const watch = async (req, res) => {
 
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.findById(id);
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
+  }
+  //영상의 owner와 로그인한 session id가 다를 경우 홈화면으로 이동
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
   }
   return res.render("edit", { pageTitle: `Editing ${video.title}`, video });
 };
 
 export const postEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const { title, description, hashtags } = req.body;
 
   //findbyId() 함수를 쓰면 object전체를 가지고 오지만
@@ -44,6 +54,10 @@ export const postEdit = async (req, res) => {
   const video = await Video.exists({ _id: id });
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
+  }
+  //영상의 owner와 로그인한 session id가 다를 경우 홈화면으로 이동
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
   }
   //mongoose 함수 사용하여 update
   await Video.findByIdAndUpdate(id, {
@@ -68,13 +82,16 @@ export const postUpload = async (req, res) => {
   const { title, description, hashtags } = req.body;
   //틀이 갖춰진 Video 데이터에 post로 받아온 내용스키마형태에 맞는 데이터를 자동으로 디비에 저장
   try {
-    await Video.create({
+    const newVideo = await Video.create({
       title,
       description,
       fileUrl,
       owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
     console.log(error);
@@ -87,7 +104,24 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
+  const video = await Video.findById(id);
+  const user = await User.findById(_id);
+
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
+  //영상의 owner와 로그인한 session id가 다를 경우 홈화면으로 이동
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+
   await Video.findByIdAndDelete(id);
+  //db에 있는 데이터도 함께 삭제 splice("찾을단어", 찾은단어로부터 삭제 할 개수)
+  user.videos.splice(user.videos.indexOf(id), 1);
+  user.save();
   return res.redirect("/");
 };
 

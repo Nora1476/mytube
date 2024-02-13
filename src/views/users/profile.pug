@@ -2,7 +2,7 @@ extends ../base
 include ../mixins/video
 
 block content 
-    each info in videos
+    each info in user.videos
       +video(info)
     else 
       div Sorry nothing found.

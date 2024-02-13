@@ -11,7 +11,7 @@ export const localsMiddleware = (req, res, next) => {
   next();
 };
 
-//로그인 안한 user가 로그인 후 접근가능한 페이지로 이동하지 못하도록 설정
+//로그인 안한 user가 로그인 해야만 접근가능한 페이지로 이동하지 못하도록 설정
 export const protectorMiddleware = (req, res, next) => {
   if (req.session.loggedIn) {
     next();
