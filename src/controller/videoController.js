@@ -6,7 +6,8 @@ import Video from "../models/Video";
 //res.send() : html 형태로 바로 응답을 보냄
 export const home = async (req, res) => {
   const videos = await Video.find({})
-    .sort({ createdAt: "desc" }) //mongoose와 연결된 모델파일 안에 Video를 통해 모든 비디오 데이터를 배열형태로 가져옴
+    .sort({ createdAt: "desc" })
+    .populate("owner") //mongoose와 연결된 모델파일 안에 Video를 통해 모든 비디오 데이터를 배열형태로 가져옴
     .then((videos) => {
       res.render("home", { pageTitle: "Home", videos });
     })
@@ -136,7 +137,7 @@ export const search = async (req, res) => {
         // $regex: new RegExp(`^${keyword}`, "i") -> keyword로 시작되는 것들을 검색.
         // $regex: new RegExp(`${keyword}$`, "i") -> keyword로 끝나는 것들을 검색.
       },
-    });
+    }).populate("owner");
   }
   return res.render("search", { pageTitle: "Search", videos });
 };

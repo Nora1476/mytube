@@ -1,13 +1,22 @@
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require("path");
 
 module.exports = {
   //변경하고자 하는 파일 (예쁜js)
   entry: "./src/client/js/main.js",
   mode: "development",
+  watch: true,
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "css/styles.css",
+    }),
+  ],
+
   //처리한 파일은 보낼 곳
   output: {
-    filename: "main.js",
-    path: path.resolve(__dirname, "assets", "js"),
+    filename: "js/main.js",
+    path: path.resolve(__dirname, "assets"),
+    clean: true,
   },
 
   //특정파일에 변형을 적용할때
@@ -25,7 +34,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: ["style-loader", "css-loader", "sass-loader"], //웹팩 적용 역순으로 적용
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"], //웹팩 적용 역순으로 적용
       },
     ],
   },

@@ -13,8 +13,10 @@ block content
     input(placeholder="Location" name="location", type="text" required)
     input(type="submit", value="Join")
 
-  hr
+    include partials/social-login
 
-  div 
-    span Already bave an account? &nbsp; 
+
+  div.auth-switch
+    span Already have an account? &nbsp; 
     a(href="/login") Log in now &nbsp; &rarr;
+    

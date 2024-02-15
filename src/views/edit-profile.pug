@@ -29,5 +29,5 @@ block content
 
     //- 소셜로그인으로 가입한경우 비밀번호 변경한 노출되지 않음
     if !loggedInUser.socialOnly
-      hr
-      a(href="change-password") Change Password &rarr;
+      div.edit-profile__password    
+        a(href="change-password") Change Password &rarr;

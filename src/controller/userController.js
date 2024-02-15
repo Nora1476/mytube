@@ -361,7 +361,13 @@ export const see = async (req, res) => {
   //누구나 볼 수 있는 public페이지로 세션을 통해서 id를 가져오지 않음
   //url을 통해 가져옴
   const { id } = req.params;
-  const user = await User.findById(id).populate("videos");
+  const user = await User.findById(id).populate({
+    path: "videos",
+    populate: {
+      path: "owner",
+      model: "User",
+    },
+  });
   if (!user) {
     return req.status(404).render("404", { pageTitle: "User not found." });
   }
