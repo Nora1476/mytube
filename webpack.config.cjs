@@ -3,7 +3,10 @@ const path = require("path");
 
 module.exports = {
   //변경하고자 하는 파일 (예쁜js)
-  entry: "./src/client/js/main.js",
+  entry: {
+    main: "./src/client/js/main.js",
+    videoPlayer: "./src/client/js/videoPlayer.js",
+  },
   mode: "development",
   watch: true,
   plugins: [
@@ -14,7 +17,7 @@ module.exports = {
 
   //처리한 파일은 보낼 곳
   output: {
-    filename: "js/main.js",
+    filename: "js/[name].js",
     path: path.resolve(__dirname, "assets"),
     clean: true,
   },
