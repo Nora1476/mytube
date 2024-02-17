@@ -22,12 +22,8 @@ let volumeValue = 0.5;
 video.volume = volumeValue;
 
 //play버튼 클릭시 동작
-const handelPlayClick = (e) => {
-  if (video.paused) {
-    video.play();
-  } else {
-    video.pause();
-  }
+const handlePlayClick = (e) => {
+  video.paused ? video.play() : video.pause();
   playBtnIcon.classList = video.paused ? "fas fa-play" : "fas fa-pause";
 };
 
@@ -109,7 +105,7 @@ const handleVideoEnded = () => {
   timeline.value = 0;
 };
 
-const handleSkip = (event) => {
+const handleKeydown = (event) => {
   event.preventDefault();
   if (event.keyCode == 39) {
     video.currentTime += 5;
@@ -117,7 +113,11 @@ const handleSkip = (event) => {
   if (event.keyCode == 37) {
     video.currentTime -= 5;
   }
+  if (event.code === "Space") {
+    handlePlayClick();
+  }
 };
+
 const handleFullscreen = () => {
   const fullscreen = document.fullscreenElement;
   if (fullscreen) {
@@ -130,6 +130,7 @@ const handleFullscreen = () => {
 };
 
 const hideControls = () => videoControls.classList.remove("showing");
+
 const handelMouseMove = () => {
   //진행되고 있던 controlTImeout이 있다면 실행멈추고 className다시 넣어줌
   if (controlTImeout) {
@@ -146,11 +147,20 @@ const handelMouseMove = () => {
   videoControls.classList.add("showing");
   controlMovementTimeout = setTimeout(hideControls, 3000);
 };
+
 const handleMouseLeave = () => {
   controlTImeout = setTimeout(hideControls, 3000);
 };
 
-playBtn.addEventListener("click", handelPlayClick);
+const handleKeydownPlay = (event) => {
+  console.log(event);
+  if (event.code === "Space") {
+    handlePlayClick();
+    event.preventDefault();
+  }
+};
+
+playBtn.addEventListener("click", handlePlayClick);
 muteBtn.addEventListener("click", handelMute);
 volumeRange.addEventListener("input", handleVolumeInput);
 volumeRange.addEventListener("change", handleVolumeChange);
@@ -161,8 +171,9 @@ video.addEventListener("timeupdate", handleTimeUpdate);
 video.addEventListener("ended", handleVideoEnded);
 video.addEventListener("mousemove", handelMouseMove);
 video.addEventListener("mouseleave", handleMouseLeave);
+video.addEventListener("click", handlePlayClick);
 
 timeline.addEventListener("input", handleTimelineInput);
-window.addEventListener("keydown", handleSkip);
+document.addEventListener("keydown", handleKeydown);
 
 fullScreenBtn.addEventListener("click", handleFullscreen);
