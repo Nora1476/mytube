@@ -1,6 +1,9 @@
 extends base.pug
 
 block content 
+  div   
+    video#preview
+    button#startBtn Start Recodeing
   if errorMessage
     span=errorMessage 
 
@@ -14,3 +17,7 @@ block content
     label(for="hashtags") Hashtags
     input(placeholder="Hashtags, separated by comma", id="hashtags", name="hashtags", type="text", required)
     input(type="submit", id="video", value="Upload Video")
+
+  
+block scripts   
+  script(src="/static/js/recoder.js")

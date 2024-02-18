@@ -100,9 +100,14 @@ const handleTimelineInput = (event) => {
 
 //재생이 끝나면 처음으로
 const handleVideoEnded = () => {
+  const { id } = videoContainer.dataset;
+
   video.currentTime = 0;
   playBtnIcon.classList = "fas fa-play";
   timeline.value = 0;
+
+  //url변경없이 해당 주소 fetch
+  fetch(`/api/videos/${id}/view`, { method: "post" });
 };
 
 const handleKeydown = (event) => {
