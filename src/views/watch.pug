@@ -24,30 +24,28 @@ block content
         span#fullScreen
           i.fas.fa-expand
 
-  div   
-    p=video.description
-    small=video.createdAt 
-
-  div  
-    small Uploaded by 
+  div.video__data 
+    p.video__title=video.title
+    small.video__owner Uploaded by
       a(href=`/users/${video.owner._id}`)=video.owner.name
-  
-  <br>
-    
+      br
+    small.video__createdAt=new Date(video.createdAt).toLocaleDateString("ko-kr", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
     if String(video.owner._id) === String(loggedInUser._id)
-      //- 제일앞에 /가있으면 절대경로임 경로 지정시 주의
-      //- a(href="/video/edit")--->localhost:4000/video/edit
-      //- a(href="video/edit")--->localhost:4000/videos/video/edit
+      br 
+      br
       a(href=`${video.id}/edit`) Edit Video &rarr;
-      <br>
+      br
       a(href=`${video.id}/delete`) Delete Video &rarr;
+  <br>
+  
 
   if loggedIn
     div.video__comments
       form.video__comment-form#commentForm  
-        textarea(cols="30" rows="10"  placeholder="Write a nice comments..")
+        textarea#commentText(cols="30" rows="10"  placeholder="Write a nice comments..")
         button Add Comment
 
 block scripts
   script(src="/static/js/videoPlayer.js")
-  script(src="/static/js/commentSection.js")
+  if loggedIn 
+    script(src="/static/js/commentSection.js")

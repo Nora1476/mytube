@@ -17,6 +17,7 @@
 @import "./screens/profile.scss";
 @import "./screens/edit-profile.scss";
 @import "./screens/upload.scss";
+@import "./screens/watch.scss";
 
 //Default
 a {
@@ -28,6 +29,9 @@ li {
 }
 
 body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family:
     system-ui,
     -apple-system,
@@ -45,9 +49,10 @@ body {
 }
 
 main {
-  min-height: 86vh;
+  height: 100%;
   max-width: 1200px;
   width: 100%;
+  flex: 1;
   margin: 0 auto;
   margin-top: 50px;
 }

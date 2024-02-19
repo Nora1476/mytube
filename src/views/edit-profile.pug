@@ -5,8 +5,8 @@ block content
     span=emailErrorMessage
     span=usernameErrorMessage
 
-  img(src=loggedInUser.avatarUrl, width="100" height="100")
-  form(method="post" enctype="multipart/form-data" ) 
+
+  form(method="post" enctype="multipart/form-data" ).edit-profile__form
     //- value값은 로그인시 middleware를 통해 local로 담아둔 정보로 pug가 바로 접근가능
     label(for="avatar") Avatar
     input(type="file" id="avatar" name="avatar"  accept=".png, .jpg, .jepg")

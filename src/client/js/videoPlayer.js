@@ -16,6 +16,8 @@ const fullScreenIcon = fullScreenBtn.querySelector("i");
 const videoContainer = document.getElementById("videoContainer");
 const videoControls = document.getElementById("videoControls");
 
+const textarea = document.getElementById("commentText");
+
 let controlTImeout = null;
 let controlMovementTimeout = null;
 let volumeValue = 0.5;
@@ -111,15 +113,19 @@ const handleVideoEnded = () => {
 };
 
 const handleKeydown = (event) => {
-  event.preventDefault();
-  if (event.keyCode == 39) {
-    video.currentTime += 5;
-  }
-  if (event.keyCode == 37) {
-    video.currentTime -= 5;
-  }
-  if (event.code === "Space") {
-    handlePlayClick();
+  if (event.target !== textarea) {
+    if (event.code === "Space") {
+      event.preventDefault();
+      handlePlayClick();
+    }
+    if (event.keyCode == 39) {
+      event.preventDefault();
+      video.currentTime += 5;
+    }
+    if (event.keyCode == 37) {
+      event.preventDefault();
+      video.currentTime -= 5;
+    }
   }
 };
 
