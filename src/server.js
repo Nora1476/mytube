@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
+import flash from "express-flash";
 import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
@@ -38,8 +39,9 @@ app.use(
 //session미들웨어 다음에 위치해야 정보를 받아올 수 있음
 app.use(localsMiddleware);
 
-//static파일 = express한테 해당폴더 안에 파일을 볼 수 있게 해달라고 요청
+app.use(flash());
 app.use("/", rootRouter);
+//static파일 = express한테 해당폴더 안에 파일을 볼 수 있게 해달라고 요청
 app.use("/uploads", express.static("uploads"));
 app.use("/static", express.static("assets"));
 app.use("/images", express.static("images"));

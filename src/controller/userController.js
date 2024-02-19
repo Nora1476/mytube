@@ -244,7 +244,10 @@ export const finishKakaoLogin = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  req.session.destroy();
+  req.session.user = null;
+  res.locals.loggedInUser = req.session.user; //local 내용만 남기고 session은 삭제 req.flash() 함수를 view(pug)단에서 local에서 불러와서 써야하기 때문에
+  req.session.loggedIn = false;
+  req.flash("info", "Bye Bye!");
   return res.redirect("/");
 };
 
@@ -319,6 +322,7 @@ export const postEdit = async (req, res) => {
 export const getChangeePassword = (req, res) => {
   //소셜로그인 사용자일 경우 홈으로 이동
   if (req.session.user.socialOnly === true) {
+    req.flash("error", "Can't change password. You logged in with Social media ");
     return res.redirect("/");
   }
 
@@ -354,6 +358,7 @@ export const postChangeePassword = async (req, res) => {
   await user.save(); //새로운 암호를 models파일 내 User.js에서 해쉬 함수화
 
   // send norification
+  req.flash("info", "Password Updated.");
   return res.redirect("/users/logout");
 };
 

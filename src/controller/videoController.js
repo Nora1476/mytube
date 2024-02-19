@@ -38,6 +38,7 @@ export const getEdit = async (req, res) => {
   }
   //영상의 owner와 로그인한 session id가 다를 경우 홈화면으로 이동
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "Not authorized.");
     return res.status(403).redirect("/");
   }
   return res.render("edit", { pageTitle: `Editing ${video.title}`, video });
@@ -52,12 +53,13 @@ export const postEdit = async (req, res) => {
 
   //findbyId() 함수를 쓰면 object전체를 가지고 오지만
   //exists() 함수를 쓰면 필터링을 통해 존재여부 확인후 ture,false형태의 불린값 출력
-  const video = await Video.exists({ _id: id });
+  const video = await Video.findbyid(id);
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
   }
   //영상의 owner와 로그인한 session id가 다를 경우 홈화면으로 이동
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "Not authorized.");
     return res.status(403).redirect("/");
   }
   //mongoose 함수 사용하여 update
@@ -67,6 +69,7 @@ export const postEdit = async (req, res) => {
     hashtags: Video.formatHashtags(hashtags),
   });
 
+  req.flash("success", "Video is Updated.");
   return res.redirect(`/videos/${id}`);
 };
 
@@ -94,6 +97,7 @@ export const postUpload = async (req, res) => {
     const user = await User.findById(_id);
     user.videos.push(newVideo._id);
     user.save();
+    req.flash("success", "Video is uploaded.");
     return res.redirect("/");
   } catch (error) {
     console.log(error);
@@ -117,6 +121,7 @@ export const deleteVideo = async (req, res) => {
   }
   //영상의 owner와 로그인한 session id가 다를 경우 홈화면으로 이동
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "You are not owner of the video.");
     return res.status(403).redirect("/");
   }
 
@@ -124,6 +129,7 @@ export const deleteVideo = async (req, res) => {
   //db에 있는 데이터도 함께 삭제 splice("찾을단어", 찾은단어로부터 삭제 할 개수)
   user.videos.splice(user.videos.indexOf(id), 1);
   user.save();
+  req.flash("info", "Video is deleted!");
   return res.redirect("/");
 };
 
