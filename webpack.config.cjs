@@ -1,12 +1,14 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require("path");
 
+const BASE_JS = "./src/client/js/";
 module.exports = {
   //변경하고자 하는 파일 (예쁜js)
   entry: {
-    main: "./src/client/js/main.js",
-    videoPlayer: "./src/client/js/videoPlayer.js",
-    recoder: "./src/client/js/recorder.js",
+    main: BASE_JS + "main.js",
+    videoPlayer: BASE_JS + "videoPlayer.js",
+    recoder: BASE_JS + "recorder.js",
+    commentSection: BASE_JS + "commentSection.js",
   },
   mode: "development",
   watch: true,
