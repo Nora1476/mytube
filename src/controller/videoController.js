@@ -54,7 +54,7 @@ export const postEdit = async (req, res) => {
 
   //findbyId() 함수를 쓰면 object전체를 가지고 오지만
   //exists() 함수를 쓰면 필터링을 통해 존재여부 확인후 ture,false형태의 불린값 출력
-  const video = await Video.findbyid(id);
+  const video = await Video.findById(id);
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
   }
