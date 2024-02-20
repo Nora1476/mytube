@@ -183,3 +183,42 @@ export const creaetComment = async (req, res) => {
   video.save();
   return res.status(201).json({ newCommentId: comment._id });
 };
+
+export const deleteComment = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    params: { id },
+  } = req;
+
+  const comment = await Comment.findById(id);
+  //url로 넘어온 id로 video찾아서 없으면 404페이지로 렌더링
+  if (!comment) {
+    return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+
+  //comment작성자와 로그인한(session) user비교session
+  if (String(comment.owner._id) !== String(_id)) {
+    req.flash("error", "You are not the owner of video.");
+    return res.status(403).redirect("/");
+  }
+
+  //1) db내 comment 삭제
+  await Comment.findByIdAndDelete(id);
+
+  //2) db User내 연결된 comments 삭제
+  const commentsOwner = await User.findById(_id);
+  commentsOwner.comments.pop(id);
+  commentsOwner.save();
+
+  //변경된 user 내용 session에 적용
+  req.session.user = commentsOwner;
+
+  //3) db Video내 연결된 comments 삭제
+  const video = await Video.findById(comment.video);
+  video.comments.pop(id);
+  video.save();
+
+  return res.sendStatus(201);
+};

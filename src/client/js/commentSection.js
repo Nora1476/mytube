@@ -1,6 +1,9 @@
 const videoContainer = document.getElementById("videoContainer");
 const form = document.getElementById("commentForm");
 
+const deleteBtn = document.getElementsByClassName("video__comment_del");
+let delBtnLength = deleteBtn.length;
+
 const addComment = (text, id) => {
   const videoComments = document.querySelector(".video__comments ul");
 
@@ -16,11 +19,19 @@ const addComment = (text, id) => {
 
   const span2 = document.createElement("span");
   span2.innerText = "❌";
+  span2.className = "video__comment_del";
 
   newComment.appendChild(icon);
   newComment.appendChild(span);
   newComment.appendChild(span2);
   videoComments.prepend(newComment);
+
+  const handleDeleteNew = (event) => {
+    event.target.parentElement.remove();
+  };
+  //새로 생긴버튼도 바로 삭제 가능하도록
+  span2.addEventListener("click", handleDeleteNew);
+  span2.addEventListener("click", handleDelete);
 };
 
 const handleSubmit = async (event) => {
@@ -32,6 +43,7 @@ const handleSubmit = async (event) => {
   if (text.trim() === "") {
     return;
   }
+
   const response = await fetch(`/api/videos/${videoId}/comment`, {
     method: "POST",
     headers: {
@@ -48,6 +60,24 @@ const handleSubmit = async (event) => {
   }
 };
 
+const handleDelete = async (e) => {
+  const prentNode = e.target.parentElement;
+  const commentId = prentNode.dataset.id;
+
+  const response = await fetch(`/api/comment/${commentId}/delete`, {
+    method: "DELETE",
+  });
+
+  //fetch 실행 완료 후
+  if (response.status === 201) {
+    prentNode.remove();
+  }
+};
+
+//이벤트 핸들러 작동
 if (form) {
   form.addEventListener("submit", handleSubmit);
+}
+for (let i = 0; i < delBtnLength; i++) {
+  deleteBtn[i].addEventListener("click", handleDelete);
 }
