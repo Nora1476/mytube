@@ -19,6 +19,7 @@ app.set("views", process.cwd() + "/src/views"); //뷰 기본 루트폴더 변경
 app.use(logger);
 
 app.use(express.urlencoded({ extended: true })); //express가 form으로 넘어오는 값을 이해할 수 있도록 설정
+app.use(express.json()); //express가 form으로 넘어오는 text를 읽어들일 수 있도록 설정
 
 //라우터 실행전에 세션 실행 express 세션이 브라우저에 쿠키를 보냄
 //세션미들웨어가 사이트로 들어오는 모두를 기악하게함

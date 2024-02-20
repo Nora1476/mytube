@@ -1,5 +1,6 @@
 import User from "../models/User";
 import Video from "../models/Video";
+import Comment from "../models/Comment";
 
 //controller파일 : 라우터에서 적용된 함수 따로 모아둔 파일
 //res.render(view, 넘겨줄 데이터) : view엔진으로 server.js에 등록된 view파일을 바로 렌더링 해줌
@@ -19,7 +20,7 @@ export const home = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params; //params = url로 넘어오는 변수를 가져오는 함수  비디오
-  const video = await Video.findById(id).populate("owner"); //populate 함수를 통해 mongoose에게 User의 owner값을 가지고 오게 함
+  const video = await Video.findById(id).populate("owner").populate("comments"); //populate 함수를 통해 mongoose에게 User의 owner값을 가지고 오게 함
   console.log(video);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
@@ -160,8 +161,25 @@ export const registerView = async (req, res) => {
   await video.save();
   return res.sendStatus(200);
 };
+
 export const creaetComment = async (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
-  return res.end();
+  const {
+    session: { user },
+    body: { text },
+    params: { id },
+  } = req;
+
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.sendStatus(404);
+  }
+  const comment = await Comment.create({
+    text,
+    owner: user._id,
+    video: id,
+  });
+  //video모델 comments 배열에 추가
+  video.comments.push(comment);
+  video.save();
+  return res.status(201).json({ newCommentId: comment._id });
 };
