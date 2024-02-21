@@ -164,7 +164,7 @@ const handleMouseLeave = () => {
 };
 
 const handleKeydownPlay = (event) => {
-  console.log(event);
+  // console.log(event);
   if (event.code === "Space") {
     handlePlayClick();
     event.preventDefault();

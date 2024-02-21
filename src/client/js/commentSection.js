@@ -18,16 +18,18 @@ const addComment = (text, id) => {
   span.innerText = ` ${text}`;
 
   const span2 = document.createElement("span");
-  span2.innerText = "❌";
   span2.className = "video__comment_del";
+  const icon2 = document.createElement("i");
+  icon2.className = "fas fa-times";
 
   newComment.appendChild(icon);
-  newComment.appendChild(span);
+  icon.appendChild(span);
   newComment.appendChild(span2);
+  span2.appendChild(icon2);
   videoComments.prepend(newComment);
 
   const handleDeleteNew = (event) => {
-    event.target.parentElement.remove();
+    event.target.parentElement.parentElement.remove();
   };
   //새로 생긴버튼도 바로 삭제 가능하도록
   span2.addEventListener("click", handleDeleteNew);
@@ -61,7 +63,7 @@ const handleSubmit = async (event) => {
 };
 
 const handleDelete = async (e) => {
-  const prentNode = e.target.parentElement;
+  const prentNode = e.target.parentElement.parentElement;
   const commentId = prentNode.dataset.id;
 
   const response = await fetch(`/api/comment/${commentId}/delete`, {
