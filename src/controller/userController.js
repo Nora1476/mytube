@@ -296,7 +296,7 @@ export const postEdit = async (req, res) => {
     _id,
     {
       //사용자가 파일변경을 하지 않을경우를 대비
-      avatarUrl: file ? `/${file.path}` : avatarUrl,
+      avatarUrl: file ? `${file.location}` : avatarUrl,
       name: name,
       email: email,
       username: username,

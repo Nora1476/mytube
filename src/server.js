@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true })); //express가 form으로 넘어�
 app.use(express.json()); //express가 form으로 넘어오는 text를 읽어들일 수 있도록 설정
 
 //라우터 실행전에 세션 실행 express 세션이 브라우저에 쿠키를 보냄
-//세션미들웨어가 사이트로 들어오는 모두를 기악하게함
+//세션미들웨어가 사이트로 들어오는 모두를 기억하게함
 app.use(
   session({
     //비밀로해야하는 string은 env파일에 넣기(환경변수로 바꾸기)
