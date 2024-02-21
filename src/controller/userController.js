@@ -266,7 +266,7 @@ export const postEdit = async (req, res) => {
     body: { name, email, username, location }, //edit-profile.pug 내 form에서 받아온 name값
   } = req;
 
-  console.log(file);
+  // console.log(file);
 
   // email, username 중복 유효성검사
   //방법1

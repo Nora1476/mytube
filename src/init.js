@@ -6,8 +6,8 @@ import "./models/Comment";
 
 import app from "./server";
 
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 
-const handleListening = () => console.log(`✅ Server listenting on port http://127.0.0.1:${PORT} 🚀`);
+const handleListening = () => console.log(`✅ Server listenting on port http://localhost:${PORT} 🚀`);
 
 app.listen(PORT, handleListening);

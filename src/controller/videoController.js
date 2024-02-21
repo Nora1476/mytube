@@ -21,7 +21,7 @@ export const home = async (req, res) => {
 export const watch = async (req, res) => {
   const { id } = req.params; //params = url로 넘어오는 변수를 가져오는 함수  비디오
   const video = await Video.findById(id).populate("owner").populate("comments"); //populate 함수를 통해 mongoose에게 User의 owner값을 가지고 오게 함
-  console.log(video);
+  // console.log(video);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
