@@ -102,8 +102,8 @@ const init = async () => {
   stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
-      width: 800,
-      height: 576,
+      width: 500,
+      height: 300,
     },
   });
   //video 내 src주소로 stream을 추가하고 video 활성화
