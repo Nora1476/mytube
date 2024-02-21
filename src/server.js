@@ -34,7 +34,9 @@ app.use(
       // maxAge: 5000,  //세션유지 기간설정 밀리세컨단위
     },
     //서버에 내 세션이 저장될 수있도록 설정
-    store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
+    store: MongoStore.create({
+      mongoUrl: process.env.DB_URL,
+    }),
   })
 );
 
