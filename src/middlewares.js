@@ -1,7 +1,6 @@
 import multer from "multer";
 import multerS3 from "multer-s3";
 import { S3Client } from "@aws-sdk/client-s3";
-import aws from "aws-sdk";
 
 const s3 = new S3Client({
   region: "ap-northeast-1", // region error solve
@@ -14,10 +13,22 @@ const s3 = new S3Client({
   },
 });
 
-const upload = multerS3({
+const isRender = process.env.NODE_ENV === "production";
+const s3ImageUploader = multerS3({
   s3: s3,
   bucket: "mytubeeee",
   acl: "public-read",
+  key: function (req, file, cb) {
+    cb(null, "images/" + file.originalname);
+  },
+});
+const s3VideoUploader = multerS3({
+  s3: s3,
+  bucket: "mytubeeee",
+  acl: "public-read",
+  key: function (req, file, cb) {
+    cb(null, "videos/" + file.originalname);
+  },
 });
 
 //pug 페이지에서 res.locals 오브젝트로 바로 접근가능
@@ -57,12 +68,12 @@ export const avatarUpload = multer({
   limits: {
     fileSize: 1000000, //바이트
   },
-  storage: upload,
+  storage: isRender ? s3ImageUploader : undefined,
 });
 export const videoUpload = multer({
   dest: "uploads/videos/",
   limits: {
-    fileSize: 20000000, //바이트
+    fileSize: 11000000, //바이트
   },
-  storage: upload,
+  storage: isRender ? s3VideoUploader : undefined,
 });

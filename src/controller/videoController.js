@@ -85,13 +85,16 @@ export const postUpload = async (req, res) => {
   const { video, thumb } = req.files;
   //post 형태로 전송된 name데이터를 받아옴
   const { title, description, hashtags } = req.body;
+
+  const isRender = process.env.NODE_ENV === "production";
+
   //틀이 갖춰진 Video 데이터에 post로 받아온 내용스키마형태에 맞는 데이터를 자동으로 디비에 저장
   try {
     const newVideo = await Video.create({
       title,
       description,
-      fileUrl: video[0].location,
-      thumbUrl: thumb[0].location,
+      fileUrl: isRender ? video[0].location : `/${video[0].destination}${video[0].filename}`,
+      thumbUrl: isRender ? thumb[0].location : `/${thumb[0].destination}${thumb[0].filename}`,
       owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
@@ -101,7 +104,7 @@ export const postUpload = async (req, res) => {
     req.flash("success", "Video is uploaded.");
     return res.redirect("/");
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(400).render("upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,

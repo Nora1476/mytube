@@ -266,7 +266,7 @@ export const postEdit = async (req, res) => {
     body: { name, email, username, location }, //edit-profile.pug 내 form에서 받아온 name값
   } = req;
 
-  // console.log(file);
+  console.log(file);
 
   // email, username 중복 유효성검사
   //방법1
@@ -291,12 +291,13 @@ export const postEdit = async (req, res) => {
     });
   }
 
+  const isRender = process.env.NODE_ENV === "production";
   //db에 있는 user를 id값으로 찾아 내용 업데이트
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
       //사용자가 파일변경을 하지 않을경우를 대비
-      avatarUrl: file ? `${file.location}` : avatarUrl,
+      avatarUrl: file ? (isRender ? file.location : `/${file.path}`) : avatarUrl,
       name: name,
       email: email,
       username: username,
