@@ -55,14 +55,14 @@ export const piblicOnlyMiddleware = (req, res, next) => {
 export const avatarUpload = multer({
   dest: "uploads/avatars/",
   limits: {
-    fileSize: 3000000, //바이트
+    fileSize: 1000000, //바이트
   },
   storage: upload,
 });
 export const videoUpload = multer({
   dest: "uploads/videos/",
   limits: {
-    fileSize: 30000000, //바이트
+    fileSize: 20000000, //바이트
   },
   storage: upload,
 });
